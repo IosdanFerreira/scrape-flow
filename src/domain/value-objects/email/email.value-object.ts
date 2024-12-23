@@ -6,20 +6,6 @@ export class EmailValueObject {
   }
 
   /**
-   * Creates a new instance of the email value object.
-   *
-   * @param email - The email address to create the value object for.
-   * @returns A new instance of the email value object.
-   * @throws {Error} If the email address is invalid.
-   */
-  public static create(email: string): EmailValueObject {
-    if (!this.emailIsValid(email)) {
-      throw new Error('Invalid email');
-    }
-    return new EmailValueObject(email);
-  }
-
-  /**
    * Retrieves the email value.
    *
    * @returns The email address as a string.
@@ -50,5 +36,20 @@ export class EmailValueObject {
 
     // Test the email address against the regular expression.
     return emailRegex.test(email) && email.length < 255;
+  }
+
+  /**
+   * Creates a new instance of the email value object.
+   *
+   * @param email - The email address to create the value object for.
+   * @returns A new instance of the email value object.
+   * @throws {Error} If the email address is invalid.
+   */
+  public static create(email: string): EmailValueObject {
+    if (!this.emailIsValid(email)) {
+      throw new Error('Invalid email');
+    }
+
+    return new EmailValueObject(email);
   }
 }
