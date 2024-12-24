@@ -2,16 +2,16 @@ import { EmailValueObject } from 'src/domain/value-objects/email/email.value-obj
 import { PasswordValueObject } from 'src/domain/value-objects/password/password.value-object';
 import { Entity } from 'src/shared/domain/entities/Entity';
 
-type UserProps = {
+type UserEntityProps = {
   name: string;
   email: EmailValueObject;
   password: PasswordValueObject;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
-export class UserEntity extends Entity<UserProps> {
-  constructor(props: UserProps, id?: string) {
+export class UserEntity extends Entity<UserEntityProps> {
+  private constructor(props: UserEntityProps, id?: string) {
     super(id, props);
   }
 
@@ -25,30 +25,12 @@ export class UserEntity extends Entity<UserProps> {
   }
 
   /**
-   * Sets the user's name.
-   *
-   * @param name - The name to be set for the user.
-   */
-  set name(name: string) {
-    this.props.name = name;
-  }
-
-  /**
    * Retrieves the user's email.
    *
    * @returns The user's email as an `EmailValueObject`.
    */
   get email(): EmailValueObject {
     return this.props.email;
-  }
-
-  /**
-   * Sets the user's email.
-   *
-   * @param email - The email to be set for the user.
-   */
-  set email(email: EmailValueObject) {
-    this.props.email = email;
   }
 
   /**
@@ -61,21 +43,12 @@ export class UserEntity extends Entity<UserProps> {
   }
 
   /**
-   * Sets the user's password.
-   *
-   * @param password - The password to be set for the user as a `PasswordValueObject`.
-   */
-  set password(password: PasswordValueObject) {
-    this.props.password = password;
-  }
-
-  /**
    * Retrieves the user's creation date.
    *
    * @returns The user's creation date as a `Date`.
    */
   get createdAt(): Date {
-    return this.props.createdAt;
+    return new Date(this.props.createdAt);
   }
 
   /**
@@ -84,6 +57,10 @@ export class UserEntity extends Entity<UserProps> {
    * @returns The user's last update date as a `Date`.
    */
   get updatedAt(): Date {
-    return this.props.updatedAt;
+    return new Date(this.props.updatedAt);
+  }
+
+  public static create(props: UserEntityProps, id?: string): UserEntity {
+    return new UserEntity(props, id);
   }
 }
