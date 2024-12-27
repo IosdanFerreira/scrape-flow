@@ -15,6 +15,7 @@ export class NameValueObject {
   public static create(name: string): NameValueObject {
     // Validate the name type.
     this.validateNameType(name);
+
     // Validate the name structure.
     this.validateNameStructure(name);
 

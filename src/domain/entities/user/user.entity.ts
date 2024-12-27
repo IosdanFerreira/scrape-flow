@@ -1,13 +1,13 @@
-import { EmailValueObject } from 'src/domain/value-objects/email/email.value-object';
-import { PasswordValueObject } from 'src/domain/value-objects/password/password.value-object';
-import { Entity } from 'src/shared/domain/entities/Entity';
+import { NameValueObject } from '@src/domain/value-objects/name/name.value-object';
+import { EmailValueObject } from '@src/domain/value-objects/email/email.value-object';
+import { PasswordValueObject } from '@src/domain/value-objects/password/password.value-object';
+import { Entity } from '@src/shared/domain/entities/Entity';
 
 type UserEntityProps = {
-  name: string;
+  name: NameValueObject;
   email: EmailValueObject;
   password: PasswordValueObject;
   createdAt?: Date;
-  updatedAt?: Date;
 };
 
 export class UserEntity extends Entity<UserEntityProps> {
@@ -16,11 +16,30 @@ export class UserEntity extends Entity<UserEntityProps> {
   }
 
   /**
+   * Creates a new instance of the UserEntity.
+   *
+   * @param props - The properties of the user entity.
+   * @param id - The optional identifier for the user entity.
+   * @returns A new instance of the UserEntity.
+   */
+  public static create(props: UserEntityProps, id?: string): UserEntity {
+    // Create a new UserEntity with the provided properties and optional id
+    // Set the createdAt property to the current date if not provided
+    return new UserEntity(
+      {
+        ...props,
+        createdAt: props.createdAt ?? new Date(),
+      },
+      id,
+    );
+  }
+
+  /**
    * Retrieves the user's name.
    *
    * @returns The user's name as a string.
    */
-  get name(): string {
+  get name(): NameValueObject {
     return this.props.name;
   }
 
@@ -49,18 +68,5 @@ export class UserEntity extends Entity<UserEntityProps> {
    */
   get createdAt(): Date {
     return new Date(this.props.createdAt);
-  }
-
-  /**
-   * Retrieves the user's last update date.
-   *
-   * @returns The user's last update date as a `Date`.
-   */
-  get updatedAt(): Date {
-    return new Date(this.props.updatedAt);
-  }
-
-  public static create(props: UserEntityProps, id?: string): UserEntity {
-    return new UserEntity(props, id);
   }
 }

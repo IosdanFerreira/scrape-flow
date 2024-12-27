@@ -1,6 +1,6 @@
 import { PasswordValueObjectValidatorFactory } from './validators/password.value-object.validator';
 
-const encryptedPasswordRegex =
+export const encryptedPasswordRegex =
   /^\$2[aby]?\$\d{2}\$[./A-Za-z0-9]{22}[./A-Za-z0-9]{31}$/;
 
 export class PasswordValueObject {
