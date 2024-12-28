@@ -2,8 +2,9 @@ import { NameValueObject } from '@src/domain/value-objects/name/name.value-objec
 import { EmailValueObject } from '@src/domain/value-objects/email/email.value-object';
 import { PasswordValueObject } from '@src/domain/value-objects/password/password.value-object';
 import { Entity } from '@src/shared/domain/entities/Entity';
+import { UserValidatorFactory } from './validators/user.entity.validator';
 
-type UserEntityProps = {
+export type UserEntityProps = {
   name: NameValueObject;
   email: EmailValueObject;
   password: PasswordValueObject;
@@ -23,8 +24,8 @@ export class UserEntity extends Entity<UserEntityProps> {
    * @returns A new instance of the UserEntity.
    */
   public static create(props: UserEntityProps, id?: string): UserEntity {
-    // Create a new UserEntity with the provided properties and optional id
-    // Set the createdAt property to the current date if not provided
+    this.validate(props);
+
     return new UserEntity(
       {
         ...props,
@@ -35,12 +36,71 @@ export class UserEntity extends Entity<UserEntityProps> {
   }
 
   /**
+   * Validates the user entity properties.
+   *
+   * This method uses the UserValidator to validate the given properties of the user entity.
+   * It throws an error if any of the properties are invalid.
+   *
+   * @param props - The properties of the user entity to validate.
+   * @throws {Error} If the properties are not valid.
+   */
+  static validate(props: UserEntityProps): void {
+    // Create an instance of the UserValidator.
+    const validator = UserValidatorFactory.create();
+
+    // Validate the given user entity properties.
+    validator.validate(props);
+  }
+
+  /**
+   * Updates the user entity.
+   *
+   * @param newName - The new name to update the user entity with.
+   */
+  update(newName: string) {
+    // Validate the new props before updating the user entity.
+    UserEntity.validate({
+      ...this.props,
+      name: NameValueObject.create(newName),
+    });
+
+    // Update the user entity.
+    this.name = NameValueObject.create(newName);
+  }
+
+  /**
+   * Updates the user's password.
+   *
+   * @param newPassword - The new password to update the user entity with.
+   * @throws {Error} If the password is invalid or not strong enough.
+   */
+  updatePassword(newPassword: string) {
+    // Validate the new password before updating the user entity.
+    UserEntity.validate({
+      ...this.props,
+      password: PasswordValueObject.create(newPassword),
+    });
+
+    // Update the user's password.
+    this.password = PasswordValueObject.create(newPassword);
+  }
+
+  /**
    * Retrieves the user's name.
    *
    * @returns The user's name as a string.
    */
   get name(): NameValueObject {
     return this.props.name;
+  }
+
+  /**
+   * Updates the user's name.
+   *
+   * @param name - The new name to update the user entity with.
+   */
+  private set name(name: NameValueObject) {
+    this.props.name = name;
   }
 
   /**
@@ -59,6 +119,15 @@ export class UserEntity extends Entity<UserEntityProps> {
    */
   get password(): PasswordValueObject {
     return this.props.password;
+  }
+
+  /**
+   * Sets the user's password.
+   *
+   * @param password - The new password to update the user entity with.
+   */
+  private set password(password: PasswordValueObject) {
+    this.props.password = password;
   }
 
   /**

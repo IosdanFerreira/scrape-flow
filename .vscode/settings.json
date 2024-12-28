@@ -5,6 +5,7 @@
     "PGTZ",
     "postgres",
     "postgresql",
+    "randexp",
     "usermod",
     "uuidv"
   ]
