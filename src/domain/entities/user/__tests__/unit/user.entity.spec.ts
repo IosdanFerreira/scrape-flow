@@ -3,6 +3,7 @@ import { UserDataBuilder } from '../../testing/helpers/user-data-builder';
 import { UserEntity } from '../../user.entity';
 import { PasswordValueObject } from '@src/domain/value-objects/password/password.value-object';
 import { EmailValueObject } from '@src/domain/value-objects/email/email.value-object';
+import { BadRequestError } from '@src/shared/domain/errors/bad-request.error';
 
 describe('UserEntity unit tests', () => {
   let validateSpy: jest.SpyInstance;
@@ -30,7 +31,9 @@ describe('UserEntity unit tests', () => {
     expect(validateSpy).toHaveBeenCalledTimes(1);
     expect(() =>
       UserEntity.create({ ...input, name: NameValueObject.create('') }),
-    ).toThrow(new Error('Name should be in the format "Name Surname"'));
+    ).toThrow(
+      new BadRequestError('Name should be in the format "Name Surname"'),
+    );
   });
 
   it('Should throw an error when name have no a instance of NameValueObject', () => {
@@ -41,7 +44,7 @@ describe('UserEntity unit tests', () => {
     };
 
     expect(() => UserEntity.create(input as any)).toThrow(
-      new Error('Name must be an instance of NameValueObject'),
+      new BadRequestError('Name must be an instance of NameValueObject'),
     );
   });
 
@@ -50,14 +53,14 @@ describe('UserEntity unit tests', () => {
 
     expect(() =>
       UserEntity.create({ ...input, name: NameValueObject.create(null) }),
-    ).toThrow(new Error('Name should be a string'));
+    ).toThrow(new BadRequestError('Name should be a string'));
 
     expect(() =>
       UserEntity.create({
         ...input,
         name: NameValueObject.create(1234 as any),
       }),
-    ).toThrow(new Error('Name should be a string'));
+    ).toThrow(new BadRequestError('Name should be a string'));
   });
 
   it('Should throw an error when User Entity have only name', () => {
@@ -66,7 +69,7 @@ describe('UserEntity unit tests', () => {
     };
 
     expect(() => UserEntity.create(input as any)).toThrow(
-      new Error('Email is required'),
+      new BadRequestError('Email is required'),
     );
   });
 
@@ -76,7 +79,7 @@ describe('UserEntity unit tests', () => {
     };
 
     expect(() => UserEntity.create(input as any)).toThrow(
-      new Error('Name is required'),
+      new BadRequestError('Name is required'),
     );
   });
 
@@ -88,7 +91,9 @@ describe('UserEntity unit tests', () => {
     };
 
     expect(() => UserEntity.create(input as any)).toThrow(
-      new Error('Password must be an instance of PasswordValueObject'),
+      new BadRequestError(
+        'Password must be an instance of PasswordValueObject',
+      ),
     );
   });
 
@@ -97,7 +102,9 @@ describe('UserEntity unit tests', () => {
 
     expect(() =>
       UserEntity.create({ ...input, password: PasswordValueObject.create('') }),
-    ).toThrow(new Error('Password must be between 8 and 20 characters'));
+    ).toThrow(
+      new BadRequestError('Password must be between 8 and 20 characters'),
+    );
   });
 
   it('Should throw an error when password is not a string', () => {
@@ -108,14 +115,14 @@ describe('UserEntity unit tests', () => {
         ...input,
         password: PasswordValueObject.create(null),
       }),
-    ).toThrow(new Error('Password should be a string'));
+    ).toThrow(new BadRequestError('Password should be a string'));
 
     expect(() =>
       UserEntity.create({
         ...input,
         password: PasswordValueObject.create(12345678 as any),
       }),
-    ).toThrow(new Error('Password should be a string'));
+    ).toThrow(new BadRequestError('Password should be a string'));
   });
 
   it('Should throw an error when password is too short', () => {
@@ -126,7 +133,9 @@ describe('UserEntity unit tests', () => {
         ...input,
         password: PasswordValueObject.create('Te1#'),
       }),
-    ).toThrow(new Error('Password must be between 8 and 20 characters'));
+    ).toThrow(
+      new BadRequestError('Password must be between 8 and 20 characters'),
+    );
   });
 
   it('Should throw an error when password is not strength enough', () => {
@@ -138,7 +147,7 @@ describe('UserEntity unit tests', () => {
         password: PasswordValueObject.create('testeteste'),
       }),
     ).toThrow(
-      new Error(
+      new BadRequestError(
         'Password must contain at least one uppercase letter, one special character and one number',
       ),
     );
@@ -149,7 +158,7 @@ describe('UserEntity unit tests', () => {
         password: PasswordValueObject.create('teste12345'),
       }),
     ).toThrow(
-      new Error(
+      new BadRequestError(
         'Password must contain at least one uppercase letter, one special character and one number',
       ),
     );
@@ -160,7 +169,7 @@ describe('UserEntity unit tests', () => {
         password: PasswordValueObject.create('Teste12345'),
       }),
     ).toThrow(
-      new Error(
+      new BadRequestError(
         'Password must contain at least one uppercase letter, one special character and one number',
       ),
     );
@@ -171,7 +180,7 @@ describe('UserEntity unit tests', () => {
         password: PasswordValueObject.create('Teste@#$#$%$'),
       }),
     ).toThrow(
-      new Error(
+      new BadRequestError(
         'Password must contain at least one uppercase letter, one special character and one number',
       ),
     );
@@ -182,7 +191,7 @@ describe('UserEntity unit tests', () => {
         password: PasswordValueObject.create('1234344@#$#$%$'),
       }),
     ).toThrow(
-      new Error(
+      new BadRequestError(
         'Password must contain at least one uppercase letter, one special character and one number',
       ),
     );
@@ -193,7 +202,7 @@ describe('UserEntity unit tests', () => {
 
     expect(() =>
       UserEntity.create({ ...input, email: EmailValueObject.create('') }),
-    ).toThrow(new Error('Invalid email'));
+    ).toThrow(new BadRequestError('Invalid email'));
   });
 
   it('Should throw an error when email is null', () => {
@@ -204,7 +213,7 @@ describe('UserEntity unit tests', () => {
         ...input,
         email: EmailValueObject.create(null as any),
       }),
-    ).toThrow(new Error('Invalid email'));
+    ).toThrow(new BadRequestError('Invalid email'));
   });
 
   it('Should throw an error when email is invalid', () => {
@@ -215,28 +224,28 @@ describe('UserEntity unit tests', () => {
         ...input,
         email: EmailValueObject.create(12345678 as any),
       }),
-    ).toThrow(new Error('Invalid email'));
+    ).toThrow(new BadRequestError('Invalid email'));
 
     expect(() =>
       UserEntity.create({
         ...input,
         email: EmailValueObject.create('Teste'),
       }),
-    ).toThrow(new Error('Invalid email'));
+    ).toThrow(new BadRequestError('Invalid email'));
 
     expect(() =>
       UserEntity.create({
         ...input,
         email: EmailValueObject.create('Teste.com'),
       }),
-    ).toThrow(new Error('Invalid email'));
+    ).toThrow(new BadRequestError('Invalid email'));
 
     expect(() =>
       UserEntity.create({
         ...input,
         email: EmailValueObject.create('Teste@.com'),
       }),
-    ).toThrow(new Error('Invalid email'));
+    ).toThrow(new BadRequestError('Invalid email'));
   });
 
   it('Should throw an error when User Entity have only email', () => {
@@ -245,7 +254,7 @@ describe('UserEntity unit tests', () => {
     };
 
     expect(() => UserEntity.create(input as any)).toThrow(
-      new Error('Name is required'),
+      new BadRequestError('Name is required'),
     );
   });
 
@@ -257,7 +266,7 @@ describe('UserEntity unit tests', () => {
     };
 
     expect(() => UserEntity.create(input as any)).toThrow(
-      new Error('Email must be an instance of EmailValueObject'),
+      new BadRequestError('Email must be an instance of EmailValueObject'),
     );
   });
 });
