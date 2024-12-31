@@ -138,4 +138,18 @@ export class UserEntity extends Entity<UserEntityProps> {
   get createdAt(): Date {
     return new Date(this.props.createdAt);
   }
+
+  /**
+   * Converts the user entity to a JSON representation.
+   *
+   * @returns An object containing the user entity's id, name, email, password, and creation date.
+   */
+  toJSON() {
+    return {
+      id: this.getId(),
+      name: this.name.getName(),
+      email: this.email.getEmail(),
+      createdAt: this.createdAt,
+    };
+  }
 }

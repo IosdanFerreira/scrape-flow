@@ -24,16 +24,4 @@ export abstract class Entity<Props = any> {
   getId(): string {
     return this.id;
   }
-
-  /**
-   * Retorna a representação da entidade em formato de objeto JSON.
-   *
-   * @returns Um objeto JSON com as propriedades da entidade, incluindo o identificador único (id).
-   */
-  toJSON(): Required<{ id: string } & Props> {
-    return {
-      id: this.id,
-      ...this.props,
-    } as Required<{ id: string } & Props>;
-  }
 }
