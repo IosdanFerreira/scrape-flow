@@ -3,7 +3,7 @@ import { compare, hash } from 'bcryptjs';
 
 export class BcryptHashAdapter implements HashAdapterInterface {
   async generateHash(password: string): Promise<string> {
-    return hash(password, 6);
+    return hash(password, 10);
   }
 
   async compareHash(password: string, hash: string): Promise<boolean> {
