@@ -5,6 +5,7 @@ export class BcryptHashAdapter implements HashAdapterInterface {
   async generateHash(password: string): Promise<string> {
     return hash(password, 6);
   }
+
   async compareHash(password: string, hash: string): Promise<boolean> {
     return compare(password, hash);
   }
