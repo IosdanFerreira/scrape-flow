@@ -18,10 +18,7 @@ type Props = {
 export function UserDataBuilder(props: Props): UserEntityProps {
   return {
     name:
-      props.name ??
-      NameValueObject.create(
-        `${faker.person.firstName()} ${faker.person.lastName()}`,
-      ),
+      props.name ?? NameValueObject.create(`John ${faker.person.firstName()}`),
 
     email: props.email ?? EmailValueObject.create(faker.internet.email()),
 

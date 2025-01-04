@@ -149,6 +149,7 @@ export class UserEntity extends Entity<UserEntityProps> {
       id: this.getId(),
       name: this.name.getName(),
       email: this.email.getEmail(),
+      password: this.password.getPassword(),
       createdAt: this.createdAt,
     };
   }
