@@ -8,11 +8,13 @@ import { v4 as uuidv4 } from 'uuid';
  * @template Props - Tipo das propriedades específicas de cada entidade.
  */
 export abstract class Entity<Props = any> {
+  private _id: string;
+
   protected constructor(
-    public readonly id: string,
+    id: string,
     public readonly props: Props,
   ) {
-    this.id = id || uuidv4();
+    this._id = id || uuidv4();
     this.props = props;
   }
 
@@ -21,7 +23,14 @@ export abstract class Entity<Props = any> {
    *
    * @returns Um identificador único (string) gerado no momento da criação da entidade.
    */
-  getId(): string {
-    return this.id;
+  get id(): string {
+    return this._id;
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      id: this._id,
+      ...this.props,
+    };
   }
 }

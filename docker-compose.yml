@@ -24,3 +24,7 @@ services:
       - PGTZ=America/Sao_Paulo
       - POSTGRES_PASSWORD=scrape-flow-secret
       - POSTGRES_DB=scrape-flow
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'

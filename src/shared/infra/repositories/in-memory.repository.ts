@@ -1,6 +1,6 @@
 import { Entity } from '@src/shared/domain/entities/Entity';
 import { NotFoundError } from '@src/shared/domain/errors/not-found.error';
-import { RepositoryContract } from '@src/shared/domain/repositories/repository-contract';
+import { RepositoryContract } from '@src/shared/domain/interfaces/repository-contract.interface';
 
 export class InMemoryRepository<T extends Entity>
   implements RepositoryContract<T>
@@ -74,7 +74,7 @@ export class InMemoryRepository<T extends Entity>
 
     // If the entity is not found, throw an error
     if (!entity) {
-      throw new NotFoundError('Entity not found');
+      throw new Error('Entity not found');
     }
 
     // Return the entity
