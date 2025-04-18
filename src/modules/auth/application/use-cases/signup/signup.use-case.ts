@@ -1,12 +1,18 @@
-import { HashAdapterInterface } from '@src/shared/application/interfaces/hash-provider.interface';
-import { SignupValidatorFactory } from './validators/signup.validator';
+import { ConflictError } from '@src/shared/domain/errors';
+import { Email } from '@src/shared/domain/value-objects/email/email.value-object';
+import { HashProviderInterface } from '@src/shared/application/interfaces/hash-provider.interface';
+import { Name } from '@src/shared/domain/value-objects/name/name.value-object';
+import { Password } from '@src/shared/domain/value-objects/password/password.value-object';
 import { UserEntity } from '@src/modules/user/domain/entity/user.entity';
+import { UserOutputDto } from '@src/modules/user/application/use-cases/dto/user-output.dto';
 import { UserRepositoryInterface } from '@src/modules/user/domain/repositories/user.repository';
+import { ValidatorStrategyInterface } from '@src/shared/domain/interfaces';
 
 export class SignUpUseCase {
   constructor(
     private readonly userRepository: UserRepositoryInterface,
-    private readonly hashAdapter: HashAdapterInterface,
+    private readonly hashProvider: HashProviderInterface,
+    private readonly validator: ValidatorStrategyInterface<SignupInput>,
   ) {}
 
   /**
@@ -19,28 +25,37 @@ export class SignUpUseCase {
    * @returns {Promise<SignupOutput>} - The created user
    */
   async execute(input: SignupInput): Promise<SignupOutput> {
-    // Check if all the required params are present
-    const validator = SignupValidatorFactory.create();
+    // Valida o input do usuário
+    this.validator.validate(input);
 
-    validator.validate(input);
+    // Verifica se o email do usuário já existe no no banco de dados
+    const emailAlreadyExist = await this.userRepository.findByEmail(
+      input.email,
+    );
 
-    // Check if the email already exists
-    await this.userRepository.emailExist(input.email);
+    if (emailAlreadyExist) {
+      throw new ConflictError('Erro ao cadastrar novo usuário', [
+        {
+          property: 'email',
+          message: 'Já existe um usuário cadastrado com esse endereço de email',
+        },
+      ]);
+    }
 
-    // Hash the password
-    const hashedPassword = await this.hashAdapter.generateHash(input.password);
+    // Gera o hash da senha do usuário
+    const hashedPassword = await this.hashProvider.generateHash(input.password);
 
-    // Create the user entity
+    // Cria uma instância do objeto User com os dados do usuário
     const user = UserEntity.create({
-      name: input.name,
-      email: input.email,
-      password: hashedPassword,
+      name: Name.create(input.name),
+      email: Email.create(input.email),
+      password: Password.create(hashedPassword),
     });
 
-    // Insert the user into the database
+    // Inclui o usuário no banco de dados
     await this.userRepository.insert(user);
 
-    // Return the created user
+    // Retorna o objeto de saída do usuário
     return user.toJSON();
   }
 }
@@ -51,9 +66,4 @@ export type SignupInput = {
   password: string;
 };
 
-export type SignupOutput = {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: Date;
-};
+export type SignupOutput = UserOutputDto;
