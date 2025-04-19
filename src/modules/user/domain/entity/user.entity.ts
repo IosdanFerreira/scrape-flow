@@ -1,15 +1,17 @@
 import { BadRequestError } from '@src/shared/domain/errors/bad-request.error';
+import { CreateUserValidator } from './validator/create-user-entity.validator';
 import { Email } from '@src/shared/domain/value-objects/email/email.value-object';
 import { Entity } from '@src/shared/domain/entities/Entity';
 import { Name } from '@src/shared/domain/value-objects/name/name.value-object';
 import { Password } from '@src/shared/domain/value-objects/password/password.value-object';
-import { UserValidator } from './validator/user-entity.validator';
+import { UpdateUserValidator } from './validator/update-user-entity.validator';
 
 export type UserEntityProps = {
   name: Name;
   email: Email;
   password: Password;
   createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export class UserEntity extends Entity<UserEntityProps> {
@@ -18,7 +20,7 @@ export class UserEntity extends Entity<UserEntityProps> {
   }
 
   public static create(props: UserEntityProps, id?: string): UserEntity {
-    const validator = new UserValidator();
+    const validator = new CreateUserValidator();
 
     validator.validate(props);
 
@@ -26,6 +28,7 @@ export class UserEntity extends Entity<UserEntityProps> {
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
+        updatedAt: props.updatedAt ?? new Date(),
       },
       id,
     );
@@ -59,9 +62,18 @@ export class UserEntity extends Entity<UserEntityProps> {
     return new Date(this.props.createdAt);
   }
 
+  public get updatedAt(): Date {
+    return new Date(this.props.updatedAt);
+  }
+
   public updateUser(props: Partial<UserEntityProps>): void {
+    const validator = new UpdateUserValidator();
+    validator.validate(props);
+
     if (props.name) this.name = props.name;
     if (props.email) this.email = props.email;
+
+    this.touch();
   }
 
   public updatePassword(newPassword: Password): void {
@@ -70,6 +82,11 @@ export class UserEntity extends Entity<UserEntityProps> {
     }
 
     this.password = newPassword;
+    this.touch();
+  }
+
+  private touch(): void {
+    this.props.updatedAt = new Date();
   }
 
   toJSON() {
@@ -79,6 +96,7 @@ export class UserEntity extends Entity<UserEntityProps> {
       email: this.email,
       password: this.password,
       createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
   }
 }

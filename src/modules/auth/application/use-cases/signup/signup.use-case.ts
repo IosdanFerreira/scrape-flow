@@ -4,7 +4,7 @@ import { HashProviderInterface } from '@src/shared/application/interfaces/hash-p
 import { Name } from '@src/shared/domain/value-objects/name/name.value-object';
 import { Password } from '@src/shared/domain/value-objects/password/password.value-object';
 import { UserEntity } from '@src/modules/user/domain/entity/user.entity';
-import { UserOutputDto } from '@src/modules/user/application/use-cases/dto/user-output.dto';
+import { UserOutputDto } from '@src/modules/user/application/use-cases/_dto/user-output.dto';
 import { UserRepositoryInterface } from '@src/modules/user/domain/repositories/user.repository';
 import { ValidatorStrategyInterface } from '@src/shared/domain/interfaces';
 
@@ -43,7 +43,10 @@ export class SignUpUseCase {
     }
 
     // Gera o hash da senha do usuário
-    const hashedPassword = await this.hashProvider.generateHash(input.password);
+    const hashedPassword = await this.hashProvider.generateHash(
+      input.password,
+      6,
+    );
 
     // Cria uma instância do objeto User com os dados do usuário
     const user = UserEntity.create({

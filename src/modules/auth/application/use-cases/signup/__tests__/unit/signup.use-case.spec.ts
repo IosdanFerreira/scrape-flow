@@ -84,7 +84,7 @@ describe('SignUpUseCase unit tests', () => {
 
     const result = await sut.execute(input);
 
-    expect(hashProvider.generateHash).toHaveBeenCalledWith(input.password);
+    expect(hashProvider.generateHash).toHaveBeenCalledWith(input.password, 6);
     expect(userRepository.insert).toHaveBeenCalledWith(user);
     expect(result).toEqual(user.toJSON());
   });
@@ -106,6 +106,6 @@ describe('SignUpUseCase unit tests', () => {
     hashProvider.generateHash.mockRejectedValue(new Error('Hash error'));
 
     await expect(sut.execute(input)).rejects.toThrow('Hash error');
-    expect(hashProvider.generateHash).toHaveBeenCalledWith(input.password);
+    expect(hashProvider.generateHash).toHaveBeenCalledWith(input.password, 6);
   });
 });

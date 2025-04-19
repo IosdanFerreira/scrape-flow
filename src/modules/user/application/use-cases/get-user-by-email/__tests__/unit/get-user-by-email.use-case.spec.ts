@@ -1,53 +1,72 @@
-import { BadRequestError } from '@src/shared/domain/errors/bad-request.error';
+import { Email } from '@src/shared/domain/value-objects/email/email.value-object';
 import { GetUserByEmailUseCase } from '../../get-user-by-email.use-case';
-import { UserDataBuilder } from '@src/domain/entities/user/testing/helpers/user-data-builder';
-import { UserEntity } from '@src/modules/user/domain/user.entity';
-import { UserInMemoryRepository } from '@src/infra/repositories/user/in-memory/user-in-memory.repository';
+import { Name } from '@src/shared/domain/value-objects/name/name.value-object';
+import { NotFoundError } from '@src/shared/domain/errors';
+import { Password } from '@src/shared/domain/value-objects/password/password.value-object';
+import { UserEntity } from '@src/modules/user/domain/entity/user.entity';
+import { UserRepositoryInterface } from '@src/modules/user/domain/repositories/user.repository';
+import { ValidatorStrategyInterface } from '@src/shared/domain/interfaces';
 
-describe('GetUserByEmailUseCase unit tests', () => {
+describe('GetUserByEmail Use Case', () => {
   let sut: GetUserByEmailUseCase;
-  let userRepository: UserInMemoryRepository;
+  let userRepository: jest.Mocked<UserRepositoryInterface>;
+  let validator: jest.Mocked<ValidatorStrategyInterface<{ email: string }>>;
+
+  const validEmail = 'johndoe@example.com';
+  const userEntity = UserEntity.create({
+    name: Name.create('John Doe'),
+    email: Email.create(validEmail),
+    password: Password.create('SecurePass123!'),
+  });
 
   beforeEach(() => {
-    userRepository = new UserInMemoryRepository();
-    sut = new GetUserByEmailUseCase(userRepository);
+    userRepository = {
+      findByID: jest.fn(),
+      update: jest.fn(),
+      insert: jest.fn(),
+      delete: jest.fn(),
+      findByEmail: jest.fn(),
+    } as jest.Mocked<UserRepositoryInterface>;
+
+    validator = {
+      validate: jest.fn(),
+    } as jest.Mocked<ValidatorStrategyInterface<{ email: string }>>;
+
+    sut = new GetUserByEmailUseCase(userRepository, validator);
   });
 
-  it('Should get a user by email', async () => {
-    const items = [UserEntity.create(UserDataBuilder({}))];
+  it('should validate the email input', async () => {
+    // Arrange
+    userRepository.findByEmail.mockResolvedValue(userEntity);
 
-    userRepository.items = items;
+    // Act
+    await sut.execute(validEmail);
 
-    const input = {
-      email: items[0].email.getEmail(),
-    };
-
-    const output = await sut.execute(input);
-
-    expect(output.email).toBe(userRepository.items[0].email.getEmail());
+    // Assert
+    expect(validator.validate).toHaveBeenCalledWith({ email: validEmail });
   });
 
-  it('Should throw an error when email not provided', async () => {
-    const input = {
-      email: null,
-    };
+  it('should return the user if found by email', async () => {
+    // Arrange
+    userRepository.findByEmail.mockResolvedValue(userEntity);
 
-    await expect(() => sut.execute(input)).rejects.toThrow(
-      new BadRequestError('Email is required'),
-    );
+    // Act
+    const result = await sut.execute(validEmail);
+
+    // Assert
+    expect(userRepository.findByEmail).toHaveBeenCalledWith(validEmail);
+    expect(result).toEqual(userEntity.toJSON());
   });
 
-  it('Should throw an error when email not is founded', async () => {
-    const items = [UserEntity.create(UserDataBuilder({}))];
+  it('should throw NotFoundError if user is not found', async () => {
+    // Arrange
+    userRepository.findByEmail.mockResolvedValue(null);
 
-    userRepository.items = items;
-
-    const input = {
-      email: 'test@gmail.com',
-    };
-
-    await expect(() => sut.execute(input)).rejects.toThrow(
-      new BadRequestError('User not found'),
+    // Act & Assert
+    await expect(sut.execute(validEmail)).rejects.toThrow(
+      new NotFoundError('Erro ao encontrar usuário', [
+        { property: 'email', message: 'Usuário nao encontrado' },
+      ]),
     );
   });
 });

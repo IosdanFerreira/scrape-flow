@@ -3,7 +3,7 @@ import { JwtTokenFactoryInterface, JwtTokenInterface } from '../../interfaces';
 import { BadRequestError } from '@src/shared/domain/errors/bad-request.error';
 import { CacheTokenInterface } from '../../interfaces/cache-token.interface';
 import { HashProviderInterface } from '@src/shared/application/interfaces/hash-provider.interface';
-import { UserOutputDto } from '../../../../user/application/use-cases/dto/user-output.dto';
+import { UserOutputDto } from '../../../../user/application/use-cases/_dto/user-output.dto';
 import { UserRepositoryInterface } from '@src/modules/user/domain/repositories/user.repository';
 import { ValidatorStrategyInterface } from '@src/shared/domain/interfaces';
 

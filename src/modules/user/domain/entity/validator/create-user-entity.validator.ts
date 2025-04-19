@@ -47,7 +47,7 @@ export class UserPasswordValidation
   }
 }
 
-export class UserValidator {
+export class CreateUserValidator {
   private strategies: ValidatorStrategyInterface<UserEntityProps>[];
 
   constructor() {
