@@ -1,38 +1,35 @@
 import { BadRequestError } from '@src/shared/domain/errors/bad-request.error';
 import { UpdateUserInput } from '../update-user.use-case';
+import { ValidatorStrategyInterface } from '@src/shared/domain/interfaces';
 
-export interface UpdateUserStrategy {
-  validate(input: any): void;
-}
-
-export class UpdateUserNameValidation implements UpdateUserStrategy {
-  validate(input: any): void {
-    if (!input.name) {
-      throw new BadRequestError('Name is required');
-    }
-
-    if (typeof input.name !== 'string') {
-      throw new BadRequestError('Name must be a string');
+class NameValidation implements ValidatorStrategyInterface<UpdateUserInput> {
+  validate(input: UpdateUserInput): void {
+    if (input.name && typeof input.name !== 'string') {
+      throw new BadRequestError('name deve ser do tipo string');
     }
   }
 }
 
-export class UpdateUserValidator implements UpdateUserStrategy {
-  strategies: UpdateUserStrategy[] = [];
+class EmailValidation implements ValidatorStrategyInterface<UpdateUserInput> {
+  validate(input: UpdateUserInput): void {
+    if (input.email && typeof input.email !== 'string') {
+      throw new BadRequestError('email deve ser do tipo string');
+    }
+  }
+}
+
+export class UpdateUserUseCaseValidator
+  implements ValidatorStrategyInterface<UpdateUserInput>
+{
+  strategies: ValidatorStrategyInterface<UpdateUserInput>[] = [];
 
   constructor() {
-    this.strategies = [new UpdateUserNameValidation()];
+    this.strategies = [new NameValidation(), new EmailValidation()];
   }
 
   validate(input: UpdateUserInput): void {
-    this.strategies.forEach((strategy) => {
+    for (const strategy of this.strategies) {
       strategy.validate(input);
-    });
-  }
-}
-
-export class UpdateUserValidatorFactory {
-  static create(): UpdateUserValidator {
-    return new UpdateUserValidator();
+    }
   }
 }

@@ -1,7 +1,4 @@
-import {
-  SearchParams,
-  SearchResult,
-} from '../repositories/searchable-repository-contract';
+import { SearchParams, SearchResult } from '../utils';
 
 import { Entity } from '../entities/Entity';
 import { RepositoryContractInterface } from './repository-contract.interface';

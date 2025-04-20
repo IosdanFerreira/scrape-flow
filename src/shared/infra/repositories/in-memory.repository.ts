@@ -1,9 +1,8 @@
 import { Entity } from '@src/shared/domain/entities/Entity';
-import { NotFoundError } from '@src/shared/domain/errors/not-found.error';
-import { RepositoryContract } from '@src/shared/domain/interfaces/repository-contract.interface';
+import { RepositoryContractInterface } from '@src/shared/domain/interfaces';
 
 export class InMemoryRepository<T extends Entity>
-  implements RepositoryContract<T>
+  implements RepositoryContractInterface<T>
 {
   items: T[] = [];
 
@@ -25,7 +24,7 @@ export class InMemoryRepository<T extends Entity>
    * @returns {Promise<T>} - A promise that resolves with the entity if found
    * @throws {NotFoundError} - If the entity is not found
    */
-  async findById(id: string): Promise<T> {
+  async findByID(id: string): Promise<T> {
     return this._get(id);
   }
 
@@ -40,7 +39,7 @@ export class InMemoryRepository<T extends Entity>
     this._get(id);
 
     // Replace the existing entity with the updated one
-    const index = this.items.findIndex((item) => item.getId() === id);
+    const index = this.items.findIndex((item) => item.id === id);
 
     this.items[index] = entity;
   }
@@ -56,7 +55,7 @@ export class InMemoryRepository<T extends Entity>
   async delete(id: string): Promise<void> {
     this._get(id);
 
-    const index = this.items.findIndex((item) => item.getId() === id);
+    const index = this.items.findIndex((item) => item.id === id);
 
     this.items.splice(index, 1);
   }
@@ -70,7 +69,7 @@ export class InMemoryRepository<T extends Entity>
    */
   protected _get(id: string): T {
     // Find the entity in the list of items
-    const entity = this.items.find((item) => item.getId() === id);
+    const entity = this.items.find((item) => item.id === id);
 
     // If the entity is not found, throw an error
     if (!entity) {

@@ -38,10 +38,13 @@ export class UpdateUserUseCase {
       ]);
     }
 
+    const name = input.name ? Name.create(input.name) : undefined;
+    const email = input.email ? Email.create(input.email) : undefined;
+
     // Atualiza o nome do usuário
     userAlreadyExists.updateUser({
-      name: Name.create(input.name),
-      email: Email.create(input.email),
+      name,
+      email,
     });
 
     // Atualiza o usuário no banco de dados
@@ -54,8 +57,8 @@ export class UpdateUserUseCase {
 
 export type UpdateUserInput = {
   id: string;
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
 };
 
 export type UpdateUserOutput = UserOutputDto;

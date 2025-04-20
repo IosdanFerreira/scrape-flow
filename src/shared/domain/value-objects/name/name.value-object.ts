@@ -13,19 +13,27 @@ export class Name {
     const nameRegex = /^([A-ZÀ-Ý][a-zà-ÿ']{2,})(?:\s[A-ZÀ-Ý][a-zà-ÿ']{2,})*$/;
 
     if (!name) {
-      throw new InvalidParamError('Nome é obrigatório');
+      throw new InvalidParamError('Nome é obrigatório', [
+        { property: 'name', message: 'O nome deve ser preenchido' },
+      ]);
     }
 
     if (typeof name !== 'string') {
-      throw new InvalidParamError('name deve ser do tipo string');
+      throw new InvalidParamError('name deve ser do tipo string', [
+        { property: 'name', message: 'name deve ser do tipo string' },
+      ]);
     }
 
     const nameTrimmed = name.trim();
 
     if (!nameRegex.test(nameTrimmed)) {
-      throw new InvalidParamError(
-        'Nome inválido, deve conter pelo menos 3 caracteres e a primeira letra maiúscula',
-      );
+      throw new InvalidParamError('Nome inválido com formato inválido', [
+        {
+          property: 'name',
+          message:
+            'O nome deve conter pelo menos 3 caracteres e a primeira letra maiúscula',
+        },
+      ]);
     }
 
     return new Name(nameTrimmed);

@@ -1,63 +1,58 @@
 import { SignupInput } from '../signup.use-case';
+import { ValidatorStrategyInterface } from '@src/shared/domain/interfaces';
 
-export interface SignupValidationStrategy {
-  validate(input: SignupInput): void;
-}
-
-export class SignupNameValidation implements SignupValidationStrategy {
+class NameValidation implements ValidatorStrategyInterface<SignupInput> {
   validate(input: SignupInput): void {
     if (!input.name) {
-      throw new Error('Name is required');
+      throw new Error('Nome precisa ser informado');
     }
 
     if (typeof input.name !== 'string') {
-      throw new Error('Name must be a string');
+      throw new Error('name deve ser do tipo string');
     }
   }
 }
 
-export class SignupEmailValidation implements SignupValidationStrategy {
+class EmailValidation implements ValidatorStrategyInterface<SignupInput> {
   validate(input: SignupInput): void {
     if (!input.email) {
-      throw new Error('Email is required');
+      throw new Error('Email precisa ser informado');
     }
 
     if (typeof input.email !== 'string') {
-      throw new Error('Email must be a string');
+      throw new Error('email deve ser do tipo string');
     }
   }
 }
 
-export class SignupPasswordValidation implements SignupValidationStrategy {
+class PasswordValidation implements ValidatorStrategyInterface<SignupInput> {
   validate(input: SignupInput): void {
     if (!input.password) {
-      throw new Error('Password is required');
+      throw new Error('A senha precisa ser informada');
     }
 
     if (typeof input.password !== 'string') {
-      throw new Error('Password must be a string');
+      throw new Error('password deve ser do tipo string');
     }
   }
 }
 
-export class SignupValidator implements SignupValidationStrategy {
-  strategies: SignupValidationStrategy[] = [];
+export class SignupUseCaseValidator
+  implements ValidatorStrategyInterface<SignupInput>
+{
+  strategies: ValidatorStrategyInterface<SignupInput>[] = [];
 
   constructor() {
     this.strategies = [
-      new SignupNameValidation(),
-      new SignupEmailValidation(),
-      new SignupPasswordValidation(),
+      new NameValidation(),
+      new EmailValidation(),
+      new PasswordValidation(),
     ];
   }
 
   validate(input: any): void {
-    this.strategies.forEach((strategy) => strategy.validate(input));
-  }
-}
-
-export class SignupValidatorFactory {
-  static create(): SignupValidator {
-    return new SignupValidator();
+    for (const strategy of this.strategies) {
+      strategy.validate(input);
+    }
   }
 }
